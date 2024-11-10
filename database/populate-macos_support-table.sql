@@ -1,4 +1,4 @@
-INSERT INTO macos-support (model_name, installed_os, last_supported_os) VALUES
+INSERT INTO macos_support (model_name, installed_os, last_supported_os) VALUES
 ('MacBook (Retina, 12-inch, Early 2015)', 'El Capitán', 'Big Sur'),
 ('MacBook Pro (15-inch, 2.53GHz, Mid 2009)', 'Leopard', 'El Capitán'),
 ('MacBook Pro (15-inch, 2016)', 'High Sierra', 'Monterey'),

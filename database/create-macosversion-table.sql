@@ -1,4 +1,4 @@
-CREATE TABLE macos_versions (
+CREATE TABLE macosversion (
     version_name VARCHAR(50),
     release_name VARCHAR(100),
     darwin_os_number VARCHAR(20),

@@ -1,4 +1,4 @@
-CREATE TABLE macos-support (
+CREATE TABLE macos_support (
     id INT AUTO_INCREMENT PRIMARY KEY,
     model_name VARCHAR(255) NOT NULL,
     installed_os VARCHAR(255) NOT NULL,

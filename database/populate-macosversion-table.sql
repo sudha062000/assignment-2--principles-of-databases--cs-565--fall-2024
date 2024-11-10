@@ -1,4 +1,4 @@
-INSERT INTO macos_versions (version_name, release_name, darwin_os_number, date_announced, date_released, latest_release_date)
+INSERT INTO macosversion (version_name, release_name, darwin_os_number, date_announced, date_released, latest_release_date)
 VALUES
     ('Mac OS X 10.0', 'Cheetah [internal codename]', '1.3.1', '2001-01-09', '2001-03-24', '2001-06-22'),
     ('Mac OS X 10.1', 'Puma [internal codename]', '1.4.1/5', '2001-07-18', '2001-10-25', '2002-06-06'),

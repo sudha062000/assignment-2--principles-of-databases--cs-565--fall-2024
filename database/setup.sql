@@ -8,3 +8,10 @@ GRANT ALL PRIVILEGES ON computer_inventory.* TO 'computer_inventory_manager'@'lo
 
 USE computer_inventory;
 source create-macosversion-table.sql;
+source create-macos_support-table.sql;
+source create-macosmodel-table.sql;
+source create-versionyear-table.sql;
+source populate-macos_support-table.sql;
+source populate-macosmodel-table.sql;
+source populate-macosversion-table.sql;
+source populate-versionyear-table.sql;
