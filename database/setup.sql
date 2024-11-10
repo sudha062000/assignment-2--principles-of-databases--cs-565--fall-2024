@@ -7,3 +7,4 @@ CREATE USER IF NOT EXISTS 'computer_inventory_manager'@'localhost' IDENTIFIED BY
 GRANT ALL PRIVILEGES ON computer_inventory.* TO 'computer_inventory_manager'@'localhost';
 
 USE computer_inventory;
+source create-macosversion-table.sql;
