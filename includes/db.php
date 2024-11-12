@@ -4,7 +4,7 @@ function getMacOSVersionCount() {
     try {
         include_once "config.php";
 
-        $db = new PDO("mysql:host=".DBHOST."; dbname=".DBNAME, DBUSER, DBPASS);
+        $conn = new mysqli(DBHOST, DBUSER, DBPASS, DBNAME);
 
         // Prepare the query to count the number of versions
         $statement = $db->prepare("SELECT COUNT(*) FROM macos_version");
