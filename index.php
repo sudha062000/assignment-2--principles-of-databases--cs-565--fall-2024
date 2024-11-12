@@ -2,8 +2,6 @@
 require 'includes/db.php';
 ?>
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,23 +13,18 @@ require 'includes/db.php';
   <link rel="stylesheet" href="css/style.css">
 </head>
 
-
-
-
-
 <body>
 
   <h1>Apple Macintosh Computer Inventory</h1>
 
-  <!-- Question: How many versions of macOS have been released? -->
+  <!-- Show how many versions of macOS have been released -->
+  <h3>How Many Versions of macOS Have Been Released?</h3>
   <?php
-  $sql = "SELECT * FROM macos_version";
-  $result = $conn->query($sql);
-  if ($result->num_rows > 0) {
-      $num_versions = $result->num_rows;
-      echo "<h3>How Many Versions of macOS Have Been Released?</h3>";
-      echo "<p>There have been $num_versions versions of macOS released thus far.</p>";
-  }
+  $sql = "SELECT COUNT(*) as version_count FROM macos_version";
+  $stmt = $conn->query($sql);
+  $row = $stmt->fetch(PDO::FETCH_ASSOC);
+  $num_versions = $row['version_count'];
+  echo "<p>There have been $num_versions versions of macOS released thus far.</p>";
   ?>
 
   <!-- Show all macOS Versions, Listed by Date Order -->
@@ -41,9 +34,10 @@ require 'includes/db.php';
                    FROM macos_version v
                    JOIN macos_dates d ON v.darwin = d.darwin
                    ORDER BY d.announced";
-  $result_versions = $conn->query($sql_versions);
+  $stmt_versions = $conn->query($sql_versions);
+  $results_versions = $stmt_versions->fetchAll(PDO::FETCH_ASSOC);
 
-  if ($result_versions->num_rows > 0) {
+  if ($results_versions) {
       echo "<table border='1'>
               <tr>
                 <th>Version Name</th>
@@ -55,7 +49,7 @@ require 'includes/db.php';
                 <th>URL</th>
               </tr>";
 
-      while($row = $result_versions->fetch_assoc()) {
+      foreach ($results_versions as $row) {
           echo "<tr>
                   <td>" . $row['version_name'] . "</td>
                   <td>" . $row['release_name'] . "</td>
@@ -70,20 +64,21 @@ require 'includes/db.php';
   }
   ?>
 
-  <!-- Show the Version Name (Release Name) and Year Released of all macOS Versions, Listed by Date Released -->
+  <!-- Show the Version Name (Release Name) and Year Released of all macOS Versions -->
   <h3>Show the Version Name (Release Name) and Year Released of all macOS Versions, Listed by Date Released</h3>
   <?php
   $sql_versions_year = "SELECT version_name, release_name, released FROM macos_version ORDER BY released";
-  $result_versions_year = $conn->query($sql_versions_year);
+  $stmt_versions_year = $conn->query($sql_versions_year);
+  $results_versions_year = $stmt_versions_year->fetchAll(PDO::FETCH_ASSOC);
 
-  if ($result_versions_year->num_rows > 0) {
+  if ($results_versions_year) {
       echo "<table border='1'>
               <tr>
                 <th>Version Name (Release Name)</th>
                 <th>Year Released</th>
               </tr>";
 
-      while($row = $result_versions_year->fetch_assoc()) {
+      foreach ($results_versions_year as $row) {
           $release_year = substr($row['released'], 0, 4); // Extract year from the release date
           echo "<tr>
                   <td>" . $row['version_name'] . " (" . $row['release_name'] . ")</td>
@@ -98,9 +93,10 @@ require 'includes/db.php';
   <h3>Show the Current Inventory (Excluding Comments)</h3>
   <?php
   $sql_inventory = "SELECT model, model_id, model_number, part_number, serial_number, darwin, url FROM macos_model";
-  $result_inventory = $conn->query($sql_inventory);
+  $stmt_inventory = $conn->query($sql_inventory);
+  $results_inventory = $stmt_inventory->fetchAll(PDO::FETCH_ASSOC);
 
-  if ($result_inventory->num_rows > 0) {
+  if ($results_inventory) {
       echo "<table border='1'>
               <tr>
                 <th>Model Name</th>
@@ -113,7 +109,7 @@ require 'includes/db.php';
                 <th>URL</th>
               </tr>";
 
-      while($row = $result_inventory->fetch_assoc()) {
+      foreach ($results_inventory as $row) {
           echo "<tr>
                   <td>" . $row['model'] . "</td>
                   <td>" . $row['model_id'] . "</td>
@@ -133,9 +129,10 @@ require 'includes/db.php';
   <h3>Show the Model, Installed/Original OS, and the Last Supported OS For the Current Inventory</h3>
   <?php
   $sql_os = "SELECT model, version_name, release_name FROM macos_version";
-  $result_os = $conn->query($sql_os);
+  $stmt_os = $conn->query($sql_os);
+  $results_os = $stmt_os->fetchAll(PDO::FETCH_ASSOC);
 
-  if ($result_os->num_rows > 0) {
+  if ($results_os) {
       echo "<table border='1'>
               <tr>
                 <th>Model</th>
@@ -143,8 +140,7 @@ require 'includes/db.php';
                 <th>Last Supported OS</th>
               </tr>";
 
-      // Displaying dummy data for illustration
-      while($row = $result_os->fetch_assoc()) {
+      foreach ($results_os as $row) {
           echo "<tr>
                   <td>" . $row['model'] . "</td>
                   <td>" . $row['version_name'] . "</td>
@@ -159,6 +155,6 @@ require 'includes/db.php';
 </html>
 
 <?php
-
-$conn->close();
+// Close the PDO connection (optional as it will be closed when the script ends)
+$conn = null;
 ?>

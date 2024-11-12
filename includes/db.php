@@ -26,27 +26,26 @@ function getMacOSVersionCount() {
     }
 }
 
-// Function to display macOS version details
+
 function getMacOSVersionsDetails() {
     try {
-        include_once "config.php";  // Include database credentials
+        include_once "config.php";
 
-        // Create a PDO connection
         $db = new PDO("mysql:host=".DBHOST."; dbname=".DBNAME, DBUSER, DBPASS);
 
-        // Prepare the query to fetch version details
+
         $statement = $db->prepare("SELECT v.version_name, v.release_name, v.darwin, d.announced, d.released, d.last_release
                                    FROM macos_version v
                                    JOIN macos_dates d ON v.darwin = d.darwin
                                    ORDER BY d.announced");
 
-        // Execute the query
+
         $statement->execute();
 
-        // Fetch all results
+
         $results = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        // Output the data in a table
+
         echo "<table border='1'>
                 <tr>
                     <th>Version Name</th>
@@ -78,7 +77,7 @@ function getMacOSVersionsDetails() {
     }
 }
 
-// Function to get macOS versions with their release years
+
 function getMacOSVersionsWithYears() {
     try {
         include_once "config.php";  // Include database credentials
