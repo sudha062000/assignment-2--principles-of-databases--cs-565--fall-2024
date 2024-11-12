@@ -1,5 +1,5 @@
 <?php
-include('includes/db.php');
+require 'includes/db.php';
 ?>
 
 
@@ -14,9 +14,7 @@ include('includes/db.php');
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,200;0,500;1,200;1,500&display=swap">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
-</body>
-</html>
+
 
 
 
@@ -161,6 +159,6 @@ include('includes/db.php');
 </html>
 
 <?php
-// Close the database connection
+
 $conn->close();
 ?>

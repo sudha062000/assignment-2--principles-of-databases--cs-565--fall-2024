@@ -1,11 +1,9 @@
 <?php
 
-// Function to get the number of macOS versions released
 function getMacOSVersionCount() {
     try {
-        include_once "config.php";  // Include database credentials
+        include_once "config.php";
 
-        // Create a PDO connection
         $db = new PDO("mysql:host=".DBHOST."; dbname=".DBNAME, DBUSER, DBPASS);
 
         // Prepare the query to count the number of versions
