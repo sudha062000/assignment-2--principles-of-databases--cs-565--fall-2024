@@ -167,4 +167,48 @@ function getCurrentInventory() {
                     <td>{$row['serial_number']}</td>
                     <td>{$row['darwin']}</td>
                     <td>{$row['latest_supported_darwin']}</td>
-                    <td><a h
+                    <td><a href='{$row['url']}'>Link</a></td>
+                  </tr>";
+        }
+
+        echo "</table>";
+
+    } catch(PDOException $error) {
+        echo "<p class='highlight'>The function <code>getCurrentInventory</code> has generated the following error:</p>" .
+             "<pre>$error</pre>" .
+             "<p class='highlight'>Exiting…</p>";
+        exit;
+    }
+}
+
+// Function to get installed/original OS and last supported OS for the current inventory
+function getInstalledAndSupportedOS() {
+    try {
+        include_once "config.php";  // Include database credentials
+
+        // Create a PDO connection
+        $db = new PDO("mysql:host=".DBHOST."; dbname=".DBNAME, DBUSER, DBPASS);
+
+        // Prepare the query to fetch installed/original OS and last supported OS
+        $statement = $db->prepare("SELECT m.model,
+                                          (SELECT release_name FROM macos_version WHERE darwin = m.darwin) AS installed_os,
+                                          (SELECT release_name FROM macos_version WHERE darwin = (SELECT darwin FROM macos_version WHERE darwin >= m.darwin ORDER BY darwin DESC LIMIT 1)) AS last_supported_os
+                                   FROM macos_model m");
+
+        // Execute the query
+        $statement->execute();
+
+        // Fetch all results
+        $results = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        // Output the data in a table
+        echo "<table border='1'>
+                <tr>
+                    <th>Model</th>
+                    <th>Installed/Original OS</th>
+                    <th>Last Supported OS</th>
+                </tr>";
+
+        foreach ($results as $row) {
+            echo "<tr>
+                    <td>{$row['model']}</td
