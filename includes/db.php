@@ -1,6 +1,6 @@
 <?php
 
-
+// Function to get the number of macOS versions released
 function getMacOSVersionCount() {
     try {
         include_once "config.php";  // Include database credentials
@@ -211,4 +211,19 @@ function getInstalledAndSupportedOS() {
 
         foreach ($results as $row) {
             echo "<tr>
-                    <td>{$row['model']}</td
+                    <td>{$row['model']}</td>
+                    <td>{$row['installed_os']}</td>
+                    <td>{$row['last_supported_os']}</td>
+                  </tr>";
+        }
+
+        echo "</table>";
+
+    } catch(PDOException $error) {
+        echo "<p class='highlight'>The function <code>getInstalledAndSupportedOS</code> has generated the following error:</p>" .
+             "<pre>$error</pre>" .
+             "<p class='highlight'>Exiting…</p>";
+        exit;
+    }
+}
+?>
