@@ -5,7 +5,7 @@ function initializeDatabaseConnection(): PDO {
     try {
         $db = new PDO(
             "mysql:host=" . DBHOST . ";dbname=" . DBNAME . ";charset=utf8",
-            DBUSER, DBPASS
+           DBUSER, DBPASS
         );
         return $db;
     } catch (PDOException $e) {
