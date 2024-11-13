@@ -8,12 +8,12 @@ GRANT ALL PRIVILEGES ON computer_inventory.* TO 'computer_inventory_manager'@'lo
 
 USE computer_inventory;
 
-source create-macos_dates-table.sql;
-source create-macos_id-table.sql;
-source create-macos_model-table.sql;
-source create-macos_version-table.sql;
+SOURCE create-macos_dates-table.sql;
+SOURCE create-macos_id-table.sql;
+SOURCE create-macos_model-table.sql;
+SOURCE create-macos_version-table.sql;
 
-source populate-macos_dates-table.sql;
-source populate-macos_id-table.sql;
-source populate-macos_model-table.sql;
-source populate-macos_version-table.sql;
+SOURCE populate-macos_dates-table.sql;
+SOURCE populate-macos_id-table.sql;
+SOURCE populate-macos_model-table.sql;
+SOURCE populate-macos_version-table.sql;
