@@ -1,23 +1,19 @@
 <?php
-// Function to initialize a database connection using PDO
 function initializeDatabaseConnection(): PDO {
-    include_once "includes/config.php"; // Assuming your config file is in the 'includes' directory
+    include_once "includes/config.php";
 
     try {
-        // Establish the connection
         $db = new PDO(
             "mysql:host=" . DBHOST . ";dbname=" . DBNAME . ";charset=utf8",
             DBUSER, DBPASS
         );
         return $db;
     } catch (PDOException $e) {
-        // Handle any errors with the connection
         echo $e->getMessage();
         exit;
     }
 }
 
-// Counts the total number of macOS versions
 function countOperatingSystemVersions(): int {
     try {
         $db = initializeDatabaseConnection();
@@ -31,7 +27,6 @@ function countOperatingSystemVersions(): int {
     }
 }
 
-// Fetches all macOS version details
 function fetchOperatingSystems(): array {
     try {
         $db = initializeDatabaseConnection();
@@ -49,14 +44,12 @@ function fetchOperatingSystems(): array {
     }
 }
 
-// Formats the macOS version and release information for display
 function formatVersionColumn(array $col): array {
     $colMod["name"] = $col["version_name"] . " (" . $col["release_name"] . ")";
-    $colMod["released"] = substr($col["released"], 0, 4); // Just the year part
+    $colMod["released"] = substr($col["released"], 0, 4);
     return $colMod;
 }
 
-// Fetches macOS version and release names with release dates formatted
 function fetchOsVersionAndRelease(): array {
     try {
         $db = initializeDatabaseConnection();
@@ -74,7 +67,6 @@ function fetchOsVersionAndRelease(): array {
     }
 }
 
-// Fetches the current device inventory with macOS compatibility details
 function fetchCurrentDeviceInventory(): array {
     try {
         $db = initializeDatabaseConnection();
@@ -95,7 +87,6 @@ function fetchCurrentDeviceInventory(): array {
     }
 }
 
-// Fetches current inventory and its macOS version compatibility information
 function fetchCurrentInventoryWithOs(): array {
     try {
         $db = initializeDatabaseConnection();

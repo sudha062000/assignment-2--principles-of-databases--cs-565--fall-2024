@@ -42,8 +42,8 @@ require 'includes/db.php';
                     </thead>
                     <tbody>
                         <?php
-                        // Fetch the macOS versions details and loop through to display
-                        $macos_versions = fetchOperatingSystems(); // Function to get versions data
+
+                        $macos_versions = fetchOperatingSystems();
                         foreach ($macos_versions as $version) {
                             echo "<tr>";
                             echo "<td>{$version['version_name']}</td>";
@@ -73,8 +73,8 @@ require 'includes/db.php';
                     </thead>
                     <tbody>
                         <?php
-                        // Fetch the version names and release years
-                        $macos_version_years = fetchOsVersionAndRelease(); // Function to get version names and years
+
+                        $macos_version_years = fetchOsVersionAndRelease();
                         foreach ($macos_version_years as $version) {
                             echo "<tr>";
                             echo "<td>{$version['name']}</td>";
@@ -106,8 +106,8 @@ require 'includes/db.php';
                     </thead>
                     <tbody>
                         <?php
-                        // Fetch current device inventory
-                        $inventory = fetchCurrentDeviceInventory(); // Function to fetch inventory data
+
+                        $inventory = fetchCurrentDeviceInventory();
                         foreach ($inventory as $device) {
                             echo "<tr>";
                             echo "<td>{$device['model']}</td>";
@@ -140,8 +140,8 @@ require 'includes/db.php';
                     </thead>
                     <tbody>
                         <?php
-                        // Fetch models with original and last supported OS
-                        $model_os_support = fetchCurrentInventoryWithOs(); // Function to fetch model OS data
+
+                        $model_os_support = fetchCurrentInventoryWithOs();
                         foreach ($model_os_support as $model) {
                             echo "<tr>";
                             echo "<td>{$model['model']}</td>";
