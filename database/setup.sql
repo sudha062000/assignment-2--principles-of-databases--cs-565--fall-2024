@@ -7,10 +7,12 @@ CREATE USER IF NOT EXISTS 'computer_inventory_manager'@'localhost' IDENTIFIED BY
 GRANT ALL PRIVILEGES ON computer_inventory.* TO 'computer_inventory_manager'@'localhost';
 
 USE computer_inventory;
+
 source create-macos_dates-table.sql;
 source create-macos_id-table.sql;
 source create-macos_model-table.sql;
 source create-macos_version-table.sql;
+
 source populate-macos_dates-table.sql;
 source populate-macos_id-table.sql;
 source populate-macos_model-table.sql;

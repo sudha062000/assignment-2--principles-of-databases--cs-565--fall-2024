@@ -1,226 +1,112 @@
 <?php
+// Function to initialize a database connection using PDO
+function initializeDatabaseConnection(): PDO {
+    include_once "includes/config.php"; // Assuming your config file is in the 'includes' directory
 
-function getMacOSVersionCount() {
     try {
-        include_once "config.php";
+        // Establish the connection
+        $db = new PDO(
+            "mysql:host=" . DBHOST . ";dbname=" . DBNAME . ";charset=utf8",
+            DBUSER, DBPASS
+        );
+        return $db;
+    } catch (PDOException $e) {
+        // Handle any errors with the connection
+        echo $e->getMessage();
+        exit;
+    }
+}
 
-        $conn = new mysqli(DBHOST, DBUSER, DBPASS, DBNAME);
-
-        // Prepare the query to count the number of versions
+// Counts the total number of macOS versions
+function countOperatingSystemVersions(): int {
+    try {
+        $db = initializeDatabaseConnection();
         $statement = $db->prepare("SELECT COUNT(*) FROM macos_version");
-
-        // Execute the query
         $statement->execute();
-
-        // Fetch the result
-        $row = $statement->fetch(PDO::FETCH_ASSOC);
-
-        // Return the count
-        return $row['COUNT(*)'];
-
-    } catch(PDOException $error) {
-        echo "<p class='highlight'>The function <code>getMacOSVersionCount</code> has generated the following error:</p>" .
-             "<pre>$error</pre>" .
-             "<p class='highlight'>Exiting…</p>";
+        $cols = $statement->fetchAll();
+        return $cols[0]['COUNT(*)'];
+    } catch (PDOException $e) {
+        echo $e->getMessage();
         exit;
     }
 }
 
-
-function getMacOSVersionsDetails() {
+// Fetches all macOS version details
+function fetchOperatingSystems(): array {
     try {
-        include_once "config.php";
-
-        $db = new PDO("mysql:host=".DBHOST."; dbname=".DBNAME, DBUSER, DBPASS);
-
-
-        $statement = $db->prepare("SELECT v.version_name, v.release_name, v.darwin, d.announced, d.released, d.last_release
-                                   FROM macos_version v
-                                   JOIN macos_dates d ON v.darwin = d.darwin
-                                   ORDER BY d.announced");
-
-
+        $db = initializeDatabaseConnection();
+        $statement = $db->prepare("
+            SELECT version_name, release_name, darwin, announced, released, last_release
+            FROM macos_version
+            NATURAL JOIN macos_dates
+            ORDER BY announced
+        ");
         $statement->execute();
-
-
-        $results = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-
-        echo "<table border='1'>
-                <tr>
-                    <th>Version Name</th>
-                    <th>Release Name</th>
-                    <th>Official Darwin OS Number</th>
-                    <th>Date Announced</th>
-                    <th>Date Released</th>
-                    <th>Date of Latest Release</th>
-                </tr>";
-
-        foreach ($results as $row) {
-            echo "<tr>
-                    <td>{$row['version_name']}</td>
-                    <td>{$row['release_name']}</td>
-                    <td>{$row['darwin']}</td>
-                    <td>{$row['announced']}</td>
-                    <td>{$row['released']}</td>
-                    <td>{$row['last_release']}</td>
-                  </tr>";
-        }
-
-        echo "</table>";
-
-    } catch(PDOException $error) {
-        echo "<p class='highlight'>The function <code>getMacOSVersionsDetails</code> has generated the following error:</p>" .
-             "<pre>$error</pre>" .
-             "<p class='highlight'>Exiting…</p>";
+        return $statement->fetchAll();
+    } catch (PDOException $e) {
+        echo $e->getMessage();
         exit;
     }
 }
 
+// Formats the macOS version and release information for display
+function formatVersionColumn(array $col): array {
+    $colMod["name"] = $col["version_name"] . " (" . $col["release_name"] . ")";
+    $colMod["released"] = substr($col["released"], 0, 4);
+    return $colMod;
+}
 
-function getMacOSVersionsWithYears() {
+// Fetches macOS version and release names with release dates formatted
+function fetchOsVersionAndRelease(): array {
     try {
-        include_once "config.php";  // Include database credentials
-
-        // Create a PDO connection
-        $db = new PDO("mysql:host=".DBHOST."; dbname=".DBNAME, DBUSER, DBPASS);
-
-        // Prepare the query to get version names with release years
-        $statement = $db->prepare("SELECT version_name, release_name, YEAR(released) AS year_released
-                                   FROM macos_version v
-                                   JOIN macos_dates d ON v.darwin = d.darwin
-                                   ORDER BY d.released");
-
-        // Execute the query
+        $db = initializeDatabaseConnection();
+        $statement = $db->prepare("
+            SELECT version_name, release_name, released
+            FROM macos_version
+            NATURAL JOIN macos_dates
+            ORDER BY released
+        ");
         $statement->execute();
-
-        // Fetch all results
-        $results = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-        // Output the data in a table
-        echo "<table border='1'>
-                <tr>
-                    <th>Version Name (Release Name)</th>
-                    <th>Year Released</th>
-                </tr>";
-
-        foreach ($results as $row) {
-            echo "<tr>
-                    <td>{$row['version_name']} ({$row['release_name']})</td>
-                    <td>{$row['year_released']}</td>
-                  </tr>";
-        }
-
-        echo "</table>";
-
-    } catch(PDOException $error) {
-        echo "<p class='highlight'>The function <code>getMacOSVersionsWithYears</code> has generated the following error:</p>" .
-             "<pre>$error</pre>" .
-             "<p class='highlight'>Exiting…</p>";
+        return array_map("formatVersionColumn", $statement->fetchAll());
+    } catch (PDOException $e) {
+        echo $e->getMessage();
         exit;
     }
 }
 
-// Function to get the current inventory of Macs
-function getCurrentInventory() {
+// Fetches the current device inventory with macOS compatibility details
+function fetchCurrentDeviceInventory(): array {
     try {
-        include_once "config.php";  // Include database credentials
-
-        // Create a PDO connection
-        $db = new PDO("mysql:host=".DBHOST."; dbname=".DBNAME, DBUSER, DBPASS);
-
-        // Prepare the query to fetch current inventory
-        $statement = $db->prepare("SELECT model, model_id, model_number, part_number, serial_number, darwin,
-                                          (SELECT darwin FROM macos_version WHERE darwin >= m.darwin ORDER BY darwin DESC LIMIT 1) AS latest_supported_darwin,
-                                          url
-                                   FROM macos_model m
-                                   ORDER BY model");
-
-        // Execute the query
+        $db = initializeDatabaseConnection();
+        $statement = $db->prepare("
+            SELECT model, model_id, model_number, part_number, serial_number, macos_model.darwin AS current_darwin,
+                   macos_version.darwin AS last_darwin, url
+            FROM macos_model
+            LEFT JOIN macos_id ON macos_model.model_id = macos_id.model_id
+            LEFT JOIN macos_version ON macos_model.darwin = macos_version.darwin
+        ");
         $statement->execute();
-
-        // Fetch all results
-        $results = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-        // Output the data in a table
-        echo "<table border='1'>
-                <tr>
-                    <th>Model Name</th>
-                    <th>Model Identifier</th>
-                    <th>Model Number</th>
-                    <th>Part Number</th>
-                    <th>Serial Number</th>
-                    <th>Darwin OS Number</th>
-                    <th>Latest Supported Darwin OS Number</th>
-                    <th>URL</th>
-                </tr>";
-
-        foreach ($results as $row) {
-            echo "<tr>
-                    <td>{$row['model']}</td>
-                    <td>{$row['model_id']}</td>
-                    <td>{$row['model_number']}</td>
-                    <td>{$row['part_number']}</td>
-                    <td>{$row['serial_number']}</td>
-                    <td>{$row['darwin']}</td>
-                    <td>{$row['latest_supported_darwin']}</td>
-                    <td><a href='{$row['url']}'>Link</a></td>
-                  </tr>";
-        }
-
-        echo "</table>";
-
-    } catch(PDOException $error) {
-        echo "<p class='highlight'>The function <code>getCurrentInventory</code> has generated the following error:</p>" .
-             "<pre>$error</pre>" .
-             "<p class='highlight'>Exiting…</p>";
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        echo $e->getMessage();
         exit;
     }
 }
 
-// Function to get installed/original OS and last supported OS for the current inventory
-function getInstalledAndSupportedOS() {
+// Fetches current inventory and its macOS version compatibility information
+function fetchCurrentInventoryWithOs(): array {
     try {
-        include_once "config.php";  // Include database credentials
-
-        // Create a PDO connection
-        $db = new PDO("mysql:host=".DBHOST."; dbname=".DBNAME, DBUSER, DBPASS);
-
-        // Prepare the query to fetch installed/original OS and last supported OS
-        $statement = $db->prepare("SELECT m.model,
-                                          (SELECT release_name FROM macos_version WHERE darwin = m.darwin) AS installed_os,
-                                          (SELECT release_name FROM macos_version WHERE darwin = (SELECT darwin FROM macos_version WHERE darwin >= m.darwin ORDER BY darwin DESC LIMIT 1)) AS last_supported_os
-                                   FROM macos_model m");
-
-        // Execute the query
+        $db = initializeDatabaseConnection();
+        $statement = $db->prepare("
+            SELECT macos_model.model, os_release.release_name AS model_release, installed_release.release_name AS device_release
+            FROM macos_model
+            JOIN macos_version AS os_release ON macos_model.darwin = os_release.darwin
+            JOIN macos_version AS installed_release ON macos_model.darwin = installed_release.darwin
+        ");
         $statement->execute();
-
-        // Fetch all results
-        $results = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-        // Output the data in a table
-        echo "<table border='1'>
-                <tr>
-                    <th>Model</th>
-                    <th>Installed/Original OS</th>
-                    <th>Last Supported OS</th>
-                </tr>";
-
-        foreach ($results as $row) {
-            echo "<tr>
-                    <td>{$row['model']}</td>
-                    <td>{$row['installed_os']}</td>
-                    <td>{$row['last_supported_os']}</td>
-                  </tr>";
-        }
-
-        echo "</table>";
-
-    } catch(PDOException $error) {
-        echo "<p class='highlight'>The function <code>getInstalledAndSupportedOS</code> has generated the following error:</p>" .
-             "<pre>$error</pre>" .
-             "<p class='highlight'>Exiting…</p>";
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        echo $e->getMessage();
         exit;
     }
 }
-?>
