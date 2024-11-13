@@ -52,7 +52,7 @@ function fetchOperatingSystems(): array {
 // Formats the macOS version and release information for display
 function formatVersionColumn(array $col): array {
     $colMod["name"] = $col["version_name"] . " (" . $col["release_name"] . ")";
-    $colMod["released"] = substr($col["released"], 0, 4);
+    $colMod["released"] = substr($col["released"], 0, 4); // Just the year part
     return $colMod;
 }
 
@@ -79,8 +79,10 @@ function fetchCurrentDeviceInventory(): array {
     try {
         $db = initializeDatabaseConnection();
         $statement = $db->prepare("
-            SELECT model, model_id, model_number, part_number, serial_number, macos_model.darwin AS current_darwin,
-                   macos_version.darwin AS last_darwin, url
+            SELECT macos_model.model, macos_model.model_id, macos_model.model_number,
+                   macos_model.part_number, macos_id.serial_number, -- Corrected to use macos_id for serial_number
+                   macos_model.darwin AS current_darwin,
+                   macos_version.darwin AS last_darwin, macos_model.url
             FROM macos_model
             LEFT JOIN macos_id ON macos_model.model_id = macos_id.model_id
             LEFT JOIN macos_version ON macos_model.darwin = macos_version.darwin
@@ -98,7 +100,9 @@ function fetchCurrentInventoryWithOs(): array {
     try {
         $db = initializeDatabaseConnection();
         $statement = $db->prepare("
-            SELECT macos_model.model, os_release.release_name AS model_release, installed_release.release_name AS device_release
+            SELECT macos_model.model,
+                   os_release.release_name AS model_release,
+                   installed_release.release_name AS device_release
             FROM macos_model
             JOIN macos_version AS os_release ON macos_model.darwin = os_release.darwin
             JOIN macos_version AS installed_release ON macos_model.darwin = installed_release.darwin
@@ -110,3 +114,4 @@ function fetchCurrentInventoryWithOs(): array {
         exit;
     }
 }
+?>
